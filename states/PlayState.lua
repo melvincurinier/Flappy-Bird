@@ -50,8 +50,6 @@ function PlayState:update(dt)
         end
     end
 
-    self.bird:update(dt)
-
     for k, pair in pairs(self.pipePairs) do
         for l, pipe in pairs(pair.pipes) do
             if self.bird:collides(pipe) then
@@ -65,7 +63,9 @@ function PlayState:update(dt)
         end
     end
 
-    if self.bird.y > VIRTUAL_HEIGHT - 15 then
+    self.bird:update(dt)
+
+    if self.bird.y > VIRTUAL_HEIGHT - 15 or self.bird.y < -BIRD_HEIGHT * 4 then
         sounds['explosion']:play()
         sounds['hurt']:play()
 
@@ -84,4 +84,12 @@ function PlayState:render()
     love.graphics.print('Score: ' .. tostring(self.score), 8, 8)
 
     self.bird:render()
+end
+
+function PlayState:enter()
+    scrolling = true
+end
+
+function PlayState:exit()
+    scrolling = false
 end

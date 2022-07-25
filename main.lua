@@ -47,6 +47,8 @@ local scrolling = true
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
+    math.randomseed(os.time())
+
     love.window.setTitle('Flappy Bird')
 
     smallFont = love.graphics.newFont('fonts/font.ttf', 8)
@@ -55,7 +57,7 @@ function love.load()
     hugeFont = love.graphics.newFont('fonts/flappy.ttf', 56)
     love.graphics.setFont(flappyFont)
 
-    sounds={
+    sounds = {
         ['jump'] = love.audio.newSource('sounds/jump.wav', 'static'),
         ['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static'),
         ['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static'),
@@ -75,18 +77,31 @@ function love.load()
     })
 
     gStateMachine = StateMachine {
-        ['title'] = function() return TitleScreenState() end,
-        ['countdown'] = function() return CountdownState() end,
-        ['play'] = function() return PlayState() end,
-        ['score'] = function() return ScoreState() end
+        ['title'] = function()
+            return TitleScreenState()
+        end,
+        ['countdown'] = function()
+            return CountdownState()
+        end,
+        ['play'] = function()
+            return PlayState()
+        end,
+        ['score'] = function()
+            return ScoreState()
+        end
     }
     gStateMachine:change('title')
 
+    love.mouse.buttonsPressed = {}
     love.keyboard.keysPressed = {}
 end
 
 function love.resize(w, h)
     push:resize(w, h)
+end
+
+function love.mousepressed(x, y, button)
+    love.mouse.buttonsPressed[button] = true
 end
 
 function love.keypressed(key)
@@ -97,23 +112,24 @@ function love.keypressed(key)
     end
 end
 
+function love.mouse.wasPressed(button)
+    return love.mouse.buttonsPressed[button]
+end
+
 function love.keyboard.wasPressed(key)
-    if love.keyboard.keysPressed[key] then
-        return true
-    else
-        return false
-    end
+    return love.keyboard.keysPressed[key]
 end
 
 function love.update(dt)
     if scrolling then
         backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
         groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
-
-        gStateMachine:update(dt)
-
-        love.keyboard.keysPressed = {}
     end
+
+    gStateMachine:update(dt)
+
+    love.mouse.buttonsPressed = {}
+    love.keyboard.keysPressed = {}
 end
 
 function love.draw()
