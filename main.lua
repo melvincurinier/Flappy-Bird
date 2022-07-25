@@ -6,6 +6,8 @@ require 'Bird'
 
 require 'Pipe'
 
+require 'PipePair'
+
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
@@ -23,18 +25,20 @@ local GROUND_SCROLL_SPEED = 60
 
 local BACKGROUND_LOOPING_POINT = 413
 
+local GROUND_LOOPING_POINT = 514
+
 local bird = Bird()
 
-local pipes = {}
+local pipePairs = {}
 
 local spawnTimer = 0
+
+local lastY = -PIPE_HEIGHT + math.random(80) + 20
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     love.window.setTitle('Flappy Bird')
-
-    math.randomseed(os.time())
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,
@@ -68,22 +72,27 @@ end
 function love.update(dt)
     backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
 
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
 
     spawnTimer = spawnTimer + dt
 
     if spawnTimer > 2 then
-        table.insert(pipes, Pipe())
+        local y = math.max(-PIPE_HEIGHT + 10, math.min(lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
+        lastY = y
+
+        table.insert(pipePairs, PipePair(y))
         spawnTimer = 0
     end
 
     bird:update(dt)
 
-    for k, pipe in pairs(pipes) do
-        pipe:update(dt)
+    for k, pair in pairs(pipePairs) do
+        pair:update(dt)
+    end
 
-        if pipe.x < -pipe.width then
-            table.remove(pipes, k)
+    for k, pair in pairs(pipePairs) do
+        if pair.remove then
+            table.remove(pipePairs, k)
         end
     end
 
@@ -95,7 +104,7 @@ function love.draw()
 
     love.graphics.draw(background, -backgroundScroll, 0)
 
-    for k, pipe in pairs(pipes) do
+    for k, pipe in pairs(pipePairs) do
         pipe:render()
     end
 
