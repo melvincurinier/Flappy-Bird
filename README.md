@@ -1,2 +1,3 @@
-# Flappy Bird
- 
+## HarvardX CS50G
+
+### CS50's Introduction to Game Development - Flappy Bird
