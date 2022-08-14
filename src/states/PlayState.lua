@@ -20,6 +20,17 @@ function PlayState:init()
 end
 
 function PlayState:update(dt)
+    if self.paused then
+        if love.keyboard.wasPressed('p') then
+            self.paused = false
+        else
+            return
+        end
+    elseif love.keyboard.wasPressed('p') then
+        self.paused = true
+        return
+    end
+
     self.timer = self.timer + dt
 
     if self.timer > 2 then
@@ -84,6 +95,11 @@ function PlayState:render()
     love.graphics.print('Score: ' .. tostring(self.score), 8, 8)
 
     self.bird:render()
+
+    if self.paused then
+        love.graphics.setFont(flappyFont)
+        love.graphics.printf("PAUSED", 0, VIRTUAL_HEIGHT / 2 - 16, VIRTUAL_WIDTH, 'center')
+    end
 end
 
 function PlayState:enter()
