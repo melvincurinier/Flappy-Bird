@@ -1,25 +1,4 @@
-push = require 'push'
-
-Class = require 'class'
-
-require 'Bird'
-
-require 'Pipe'
-
-require 'PipePair'
-
-require 'StateMachine'
-require 'states/BaseState'
-require 'states/PlayState'
-require 'states/ScoreState'
-require 'states/CountdownState'
-require 'states/TitleScreenState'
-
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
-
-VIRTUAL_WIDTH = 512
-VIRTUAL_HEIGHT = 288
+require 'src/Dependencies'
 
 local background = love.graphics.newImage('images/background.png')
 local backgroundScroll = 0
